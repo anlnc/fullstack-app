@@ -1,16 +1,17 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
   Put,
   Request,
+  UnauthorizedException,
 } from "@nestjs/common";
 
 import { FastifyRequest } from "fastify";
@@ -34,11 +35,11 @@ export class ArticleController {
     @Request() request: FastifyRequest
   ): Promise<ApiResponse> {
     const { user }: Record<string, any> = request;
-    if (!user) {
-      throw new NotFoundException();
+    if (user?.id) {
+      throw new UnauthorizedException();
     }
-    await this.articlesService.create(createArticleDto, user.id);
-    return new ApiResponse(HttpStatus.CREATED, { success: true });
+    const article = await this.articlesService.create(createArticleDto, user.id);
+    return new ApiResponse(HttpStatus.CREATED, article);
   }
 
   @Put("/:article_id")
@@ -46,11 +47,11 @@ export class ArticleController {
     @Body() updateArticleDto: UpdateArticleDto,
     @Param("article_id", ParseIntPipe) articleId: number
   ): Promise<ApiResponse> {
-    const articleToUpdate = await this.articlesService.findOne(articleId);
-    if (!articleToUpdate) {
-      throw new NotFoundException();
+    const { title, body } = updateArticleDto;
+    if (!title || !body || !articleId) {
+      throw new BadRequestException();
     }
-    await this.articlesService.update(updateArticleDto, articleId);
+    await this.articlesService.update({ title, body }, articleId);
     return new ApiResponse(HttpStatus.OK, { success: true });
   }
 
@@ -59,20 +60,18 @@ export class ArticleController {
   async unfavoriteArticle(
     @Param("article_id", ParseIntPipe) articleId: number
   ): Promise<ApiResponse> {
-    const articleToUnfavorite = await this.articlesService.findOne(articleId);
-    if (!articleToUnfavorite) {
-      throw new NotFoundException();
+    if (!articleId) {
+      throw new BadRequestException();
     }
-    await this.articlesService.unfavoriteArticle(articleId);
+    await this.articlesService.unfavorite(articleId);
     return new ApiResponse(HttpStatus.OK, { success: true });
   }
 
   @Delete("/:article_id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteArticle(@Param("article_id", ParseIntPipe) articleId: number): Promise<ApiResponse> {
-    const articleToDelete = await this.articlesService.findOne(articleId);
-    if (!articleToDelete) {
-      throw new NotFoundException();
+    if (!articleId) {
+      throw new BadRequestException();
     }
     await this.articlesService.delete(articleId);
     return new ApiResponse(HttpStatus.NO_CONTENT, { success: true });
@@ -83,12 +82,10 @@ export class ArticleController {
   async favoriteArticle(
     @Param("article_id", ParseIntPipe) articleId: number
   ): Promise<ApiResponse> {
-    const articleToFavorite = await this.articlesService.findOne(articleId);
-    if (!articleToFavorite) {
-      throw new NotFoundException();
+    if (!articleId) {
+      throw new BadRequestException();
     }
-
-    await this.articlesService.favoriteArticle(articleToFavorite.id);
+    await this.articlesService.favorite(articleId);
     return new ApiResponse(HttpStatus.OK, { success: true });
   }
 }

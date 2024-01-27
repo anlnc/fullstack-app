@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   NotFoundException,
   Param,
@@ -30,17 +31,17 @@ export class UserController {
   @Get()
   async findAll(@Request() request: FastifyRequest): Promise<ApiResponse> {
     const { user }: Record<string, any> = request;
-    const users = await this.usersService.findAll(user.id);
+    const users = await this.usersService.findAll({ idToExclude: user.id });
     return new ApiResponse(HttpStatus.OK, users);
   }
 
   @Delete("/:email")
+  @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
     @Request() request: FastifyRequest,
     @Param("email") email: string
   ): Promise<ApiResponse> {
     const { user: requester }: Record<string, any> = request;
-
     const userToDelete = await this.usersService.findOne(email);
     if (!userToDelete) {
       throw new NotFoundException();
@@ -51,7 +52,7 @@ export class UserController {
       throw new BadRequestException();
     }
 
-    await this.usersService.delete(userToDelete.id);
-    return new ApiResponse(HttpStatus.OK, { success: true });
+    await this.usersService.delete(userToDelete.email);
+    return new ApiResponse(HttpStatus.NO_CONTENT, { success: true });
   }
 }

@@ -1,79 +1,90 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+
+import {
+  ConflictError,
+  DatabaseAccessError,
+  MissingRequiredArgumentError,
+  NotFoundError,
+} from "src/common/types";
 import { PrismaService } from "src/prisma.service";
 import { CreateUserDto } from "./dto/users.dto";
-import { UserEntity } from "./interfaces/user.interface";
 
 @Injectable()
 export class UserService {
   private SALT = 10;
-  private FIELDS_TO_RETURN = {
-    id: true,
-    username: true,
-    fullname: true,
-    email: true,
-  };
 
   constructor(private prisma: PrismaService) {}
 
   async findOne(email: string): Promise<User> {
-    return this.prisma.user.findUnique({ where: { email } });
+    if (!email) {
+      throw new MissingRequiredArgumentError("Email is required");
+    }
+    try {
+      const user = await this.prisma.user.findUnique({ where: { email } });
+      return user;
+    } catch (error) {
+      throw new DatabaseAccessError();
+    }
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
-    if (!createUserDto) {
-      throw new BadRequestException();
-    }
-
-    const { email, username, fullname, password } = createUserDto;
+  async create(userInfo: CreateUserDto): Promise<User> {
+    const { email, username, fullname, password } = userInfo ?? {};
     if (!email || !username || !fullname || !password) {
-      throw new BadRequestException();
+      throw new MissingRequiredArgumentError("Missing required argument");
     }
-
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (user) {
-      throw new ConflictException("User already exists");
-    }
-    const payload = { email, username, fullname, password: await bcrypt.hash(password, this.SALT) };
     try {
-      return this.prisma.user.create({
-        data: payload,
-        select: this.FIELDS_TO_RETURN,
-      });
-    } catch (error) {
-      throw new InternalServerErrorException();
-    }
-  }
-
-  async findAll(idToExclude: number): Promise<UserEntity[]> {
-    if (!idToExclude) {
-      throw new BadRequestException();
-    }
-    const users = await this.prisma.user.findMany({
-      where: {
-        id: {
-          not: idToExclude,
+      const user = await this.findOne(email);
+      if (user) {
+        throw new ConflictError(`User with email ${email} already exists`);
+      }
+      const hashedPassword = await bcrypt.hash(password, this.SALT);
+      const createdUser = await this.prisma.user.create({
+        data: {
+          email,
+          username,
+          fullname,
+          password: hashedPassword,
         },
-      },
-      select: this.FIELDS_TO_RETURN,
-    });
-    return users;
+      });
+      return createdUser;
+    } catch (error) {
+      if (error instanceof ConflictError) {
+        throw error;
+      }
+      throw new DatabaseAccessError();
+    }
   }
 
-  async delete(id: number): Promise<void> {
-    if (!id) {
-      throw new BadRequestException();
+  async findAll({ idToExclude }: { idToExclude?: number }): Promise<User[]> {
+    try {
+      const users = await this.prisma.user.findMany();
+      if (!idToExclude) {
+        return users;
+      }
+      return users.filter(user => user.id !== idToExclude);
+    } catch (error) {
+      throw new DatabaseAccessError();
+    }
+  }
+
+  async delete(email: string): Promise<User> {
+    if (!email) {
+      throw new MissingRequiredArgumentError(`User email is required`);
     }
     try {
-      await this.prisma.user.delete({ where: { id } });
+      const userToDelete = await this.findOne(email);
+      if (!userToDelete) {
+        throw new NotFoundError(`User with email ${email} not found`);
+      }
+      const deletedUser = await this.prisma.user.delete({ where: { email } });
+      return deletedUser;
     } catch (error) {
-      throw new InternalServerErrorException();
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      throw new DatabaseAccessError();
     }
   }
 }

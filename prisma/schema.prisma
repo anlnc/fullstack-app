@@ -32,7 +32,7 @@ model Article {
   updatedAt DateTime? @map("updated_at")
   favoriteCount  Int      @default(0) @map("favorite_count")
   authorId     Int     @map("author_id")
-  author     User     @relation(fields: [authorId], references: [id])
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@map("articles")
 }
