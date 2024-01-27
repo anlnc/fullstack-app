@@ -35,7 +35,7 @@ export class ArticleController {
     @Request() request: FastifyRequest
   ): Promise<ApiResponse> {
     const { user }: Record<string, any> = request;
-    if (user?.id) {
+    if (!user?.id) {
       throw new UnauthorizedException();
     }
     const article = await this.articlesService.create(createArticleDto, user.id);
@@ -47,7 +47,7 @@ export class ArticleController {
     @Body() updateArticleDto: UpdateArticleDto,
     @Param("article_id", ParseIntPipe) articleId: number
   ): Promise<ApiResponse> {
-    const { title, body } = updateArticleDto;
+    const { title, body } = updateArticleDto ?? {};
     if (!title || !body || !articleId) {
       throw new BadRequestException();
     }
