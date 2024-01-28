@@ -13,8 +13,6 @@ import { CreateUserDto } from "./dto/user.dto";
 
 @Injectable()
 export class UserService {
-  private SALT = 10;
-
   constructor(private prisma: PrismaService) {}
 
   async findOne(email: string): Promise<User> {
@@ -39,7 +37,7 @@ export class UserService {
       if (user) {
         throw new ConflictError(`User with email ${email} already exists`);
       }
-      const hashedPassword = await bcrypt.hash(password, this.SALT);
+      const hashedPassword = await bcrypt.hash(password, process.env.SALT);
       const createdUser = await this.prisma.user.create({
         data: {
           email,
