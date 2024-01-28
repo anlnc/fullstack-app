@@ -10,7 +10,9 @@ export class ArticleService {
   // @TODO: handle pagination
   async listArticles(): Promise<Article[]> {
     try {
-      const articles = await this.prisma.article.findMany({ orderBy: { createdAt: "desc" } });
+      const articles = await this.prisma.article.findMany({
+        orderBy: { createdAt: "desc" },
+      });
       return articles;
     } catch (error) {
       throw new DatabaseAccessError();
@@ -73,7 +75,7 @@ export class ArticleService {
     }
   }
 
-  async delete(articleId: number): Promise<void> {
+  async delete(articleId: number): Promise<Article> {
     if (!articleId) {
       throw new MissingRequiredArgumentError("Article id is required");
     }
@@ -82,9 +84,10 @@ export class ArticleService {
       if (!articleToDelete) {
         throw new NotFoundError(`Article with id ${articleId} not found`);
       }
-      await this.prisma.article.delete({
+      const deletedArticle = await this.prisma.article.delete({
         where: { id: articleId },
       });
+      return deletedArticle;
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;

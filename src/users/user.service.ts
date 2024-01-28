@@ -9,7 +9,7 @@ import {
   NotFoundError,
 } from "src/common/types";
 import { PrismaService } from "src/prisma.service";
-import { CreateUserDto } from "./dto/users.dto";
+import { CreateUserDto } from "./dto/user.dto";
 
 @Injectable()
 export class UserService {
