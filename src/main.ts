@@ -21,6 +21,7 @@ async function bootstrap() {
   await app.register(fastifyCookie);
   app.setGlobalPrefix(GLOBAL_PREFIX, { exclude: [{ path: "", method: RequestMethod.GET }] });
   setupSwagger(app);
-  await app.listen(3000);
+  app.enableCors();
+  await app.listen(8080);
 }
 bootstrap();
