@@ -22,7 +22,7 @@ async function bootstrap() {
   app.setGlobalPrefix(GLOBAL_PREFIX, { exclude: [{ path: "", method: RequestMethod.GET }] });
   setupSwagger(app);
   app.enableCors();
-  console.info("LISTENING ON PORT 3000");
-  await app.listen(3000, "0.0.0.0");
+  console.info("LISTENING ON PORT 8080");
+  await app.listen(8080, "0.0.0.0");
 }
 bootstrap();
