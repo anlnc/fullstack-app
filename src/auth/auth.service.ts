@@ -16,7 +16,7 @@ export class AuthService {
       throw new MissingRequiredArgumentError("Email and password are required");
     }
 
-    const user = await this.usersService.findOne(email);
+    const user = await this.usersService.findOne({ email });
     if (!user) {
       throw new NotFoundError("User not found");
     }

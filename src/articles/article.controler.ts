@@ -39,6 +39,7 @@ export class ArticleController {
     return new ArticleListResponse(
       HttpStatus.OK,
       articles.map(article => ({
+        id: article.id,
         title: article.title,
         body: article.body,
         favoriteCount: article.favoriteCount,
@@ -64,6 +65,7 @@ export class ArticleController {
     }
     const article = await this.articlesService.create(createArticleDto, user.id);
     return new ArticleResponse(HttpStatus.CREATED, {
+      id: article.id,
       title: article.title,
       body: article.body,
       favoriteCount: article.favoriteCount,
@@ -91,6 +93,7 @@ export class ArticleController {
     }
     const article = await this.articlesService.update({ title, body }, articleId);
     return new ArticleResponse(HttpStatus.OK, {
+      id: article.id,
       title: article.title,
       body: article.body,
       favoriteCount: article.favoriteCount,
@@ -115,6 +118,7 @@ export class ArticleController {
     }
     const article = await this.articlesService.unfavorite(articleId);
     return new ArticleResponse(HttpStatus.OK, {
+      id: article.id,
       title: article.title,
       body: article.body,
       favoriteCount: article.favoriteCount,
@@ -132,6 +136,7 @@ export class ArticleController {
     }
     const article = await this.articlesService.delete(articleId);
     return new ArticleResponse(HttpStatus.OK, {
+      id: article.id,
       title: article.title,
       body: article.body,
       favoriteCount: article.favoriteCount,
@@ -159,6 +164,7 @@ export class ArticleController {
     }
     const article = await this.articlesService.favorite(articleId);
     return new ArticleResponse(HttpStatus.OK, {
+      id: article.id,
       title: article.title,
       body: article.body,
       favoriteCount: article.favoriteCount,

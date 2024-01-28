@@ -3,6 +3,9 @@ import { ApiResponse } from "src/common/types";
 
 export class ArticleEntity {
   @ApiProperty({ type: String })
+  id: string;
+
+  @ApiProperty({ type: String })
   title: string;
 
   @ApiProperty({ type: String })
@@ -12,14 +15,17 @@ export class ArticleEntity {
   favorite_count: number;
 
   constructor({
+    id,
     title,
     body,
     favoriteCount,
   }: {
+    id: string;
     title: string;
     body: string;
     favoriteCount: number;
   }) {
+    this.id = id;
     this.title = title;
     this.body = body;
     this.favorite_count = favoriteCount;

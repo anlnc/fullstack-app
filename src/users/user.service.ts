@@ -15,12 +15,16 @@ import { CreateUserDto } from "./dto/user.dto";
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(email: string): Promise<User> {
+  async findOne({ email, username }: { email: string; username?: string }): Promise<User> {
     if (!email) {
       throw new MissingRequiredArgumentError("Email is required");
     }
     try {
-      const user = await this.prisma.user.findUnique({ where: { email } });
+      const user = await this.prisma.user.findFirst({
+        where: {
+          OR: [{ email }, { username }],
+        },
+      });
       return user;
     } catch (error) {
       throw new DatabaseAccessError();
@@ -33,7 +37,7 @@ export class UserService {
       throw new MissingRequiredArgumentError("Missing required argument");
     }
     try {
-      const user = await this.findOne(email);
+      const user = await this.findOne({ email, username });
       if (user) {
         throw new ConflictError(`User with email ${email} already exists`);
       }
@@ -72,7 +76,7 @@ export class UserService {
       throw new MissingRequiredArgumentError(`User email is required`);
     }
     try {
-      const userToDelete = await this.findOne(email);
+      const userToDelete = await this.findOne({ email });
       if (!userToDelete) {
         throw new NotFoundError(`User with email ${email} not found`);
       }

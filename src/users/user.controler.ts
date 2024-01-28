@@ -36,8 +36,8 @@ export class UserController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto): Promise<ApiResponse> {
     const user = await this.usersService.create(createUserDto);
-    const { email, username } = user;
-    return new UserResponse(HttpStatus.CREATED, { email, username });
+    const { id, email, username } = user;
+    return new UserResponse(HttpStatus.CREATED, { id, email, username });
   }
 
   @ApiOperation({
@@ -53,7 +53,7 @@ export class UserController {
     const users = await this.usersService.findAll({ idToExclude: user.id });
     return new UserListResponse(
       HttpStatus.OK,
-      users.map(({ email, username }) => ({ email, username }))
+      users.map(({ id, email, username }) => ({ id, email, username }))
     );
   }
 
@@ -68,7 +68,7 @@ export class UserController {
     @Param("email") email: string
   ): Promise<ApiResponse> {
     const { user: requester }: Record<string, any> = request;
-    const userToDelete = await this.usersService.findOne(email);
+    const userToDelete = await this.usersService.findOne({ email });
     if (!userToDelete) {
       throw new NotFoundException();
     }
@@ -78,7 +78,7 @@ export class UserController {
       throw new BadRequestException();
     }
 
-    const { username } = await this.usersService.delete(userToDelete.email);
-    return new UserResponse(HttpStatus.NO_CONTENT, { email, username });
+    const { id, username } = await this.usersService.delete(userToDelete.email);
+    return new UserResponse(HttpStatus.NO_CONTENT, { id, email, username });
   }
 }

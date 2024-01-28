@@ -31,7 +31,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       case error instanceof DatabaseAccessError: {
         return reply.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: error.message,
+          message: "Internal Server Error",
         });
       }
 

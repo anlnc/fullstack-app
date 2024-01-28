@@ -3,12 +3,16 @@ import { ApiResponse } from "src/common/types";
 
 export class UserEntity {
   @ApiProperty({ type: String })
+  id: string;
+
+  @ApiProperty({ type: String })
   email: string;
 
   @ApiProperty({ type: String })
   username: string;
 
-  constructor({ email, username }: Record<string, string>) {
+  constructor({ id, email, username }: Record<string, string>) {
+    this.id = id;
     this.email = email;
     this.username = username;
   }
