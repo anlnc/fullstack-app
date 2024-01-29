@@ -39,7 +39,7 @@ export class UserService {
     try {
       const user = await this.findOne({ email, username });
       if (user) {
-        throw new ConflictError(`User with email ${email} already exists`);
+        throw new ConflictError(`User with email ${email} or username ${username} already exists`);
       }
       const hashedPassword = await bcrypt.hash(password, Number(process.env.SALT));
       const createdUser = await this.prisma.user.create({
@@ -59,13 +59,14 @@ export class UserService {
     }
   }
 
-  async findAll({ idToExclude }: { idToExclude?: number }): Promise<User[]> {
+  async findAll(): Promise<User[]> {
     try {
-      const users = await this.prisma.user.findMany();
-      if (!idToExclude) {
-        return users;
-      }
-      return users.filter(user => user.id !== idToExclude);
+      const users = await this.prisma.user.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+      return users;
     } catch (error) {
       throw new DatabaseAccessError();
     }

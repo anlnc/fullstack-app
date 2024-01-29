@@ -14,21 +14,33 @@ export class ArticleEntity {
   @ApiProperty({ type: Number })
   favorite_count: number;
 
+  @ApiProperty({ type: Date })
+  created_at: Date;
+
+  @ApiProperty({ type: Date })
+  updated_at: Date;
+
   constructor({
     id,
     title,
     body,
     favoriteCount,
+    createdAt,
+    updatedAt,
   }: {
     id: string;
     title: string;
     body: string;
     favoriteCount: number;
+    createdAt: Date;
+    updatedAt: Date;
   }) {
     this.id = id;
     this.title = title;
     this.body = body;
     this.favorite_count = favoriteCount;
+    this.created_at = createdAt;
+    this.updated_at = updatedAt;
   }
 }
 

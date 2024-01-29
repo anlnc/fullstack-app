@@ -36,8 +36,8 @@ export class UserController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto): Promise<ApiResponse> {
     const user = await this.usersService.create(createUserDto);
-    const { id, email, username } = user;
-    return new UserResponse(HttpStatus.CREATED, { id, email, username });
+    const { id, email, username, fullname } = user;
+    return new UserResponse(HttpStatus.CREATED, { id, email, username, fullname });
   }
 
   @ApiOperation({
@@ -49,12 +49,18 @@ export class UserController {
   })
   @Get()
   async findAll(@Request() request: FastifyRequest): Promise<UserListResponse> {
-    const { user }: Record<string, any> = request;
-    const users = await this.usersService.findAll({ idToExclude: user.id });
-    return new UserListResponse(
-      HttpStatus.OK,
-      users.map(({ id, email, username }) => ({ id, email, username }))
-    );
+    const { user: requester }: Record<string, any> = request;
+    const users = await this.usersService.findAll();
+    // Remove requester from the list
+    const userEntities = users
+      .filter(({ id }) => id !== requester.id)
+      .map(({ id, email, username, fullname }) => ({
+        id,
+        email,
+        username,
+        fullname,
+      }));
+    return new UserListResponse(HttpStatus.OK, userEntities);
   }
 
   @ApiOperation({
@@ -78,7 +84,7 @@ export class UserController {
       throw new BadRequestException();
     }
 
-    const { id, username } = await this.usersService.delete(userToDelete.email);
-    return new UserResponse(HttpStatus.NO_CONTENT, { id, email, username });
+    const { id, username, fullname } = await this.usersService.delete(userToDelete.email);
+    return new UserResponse(HttpStatus.NO_CONTENT, { id, email, username, fullname });
   }
 }

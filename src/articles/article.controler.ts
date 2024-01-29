@@ -43,6 +43,8 @@ export class ArticleController {
         title: article.title,
         body: article.body,
         favoriteCount: article.favoriteCount,
+        createdAt: article.createdAt,
+        updatedAt: article.updatedAt,
       }))
     );
   }
@@ -69,6 +71,8 @@ export class ArticleController {
       title: article.title,
       body: article.body,
       favoriteCount: article.favoriteCount,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
     });
   }
 
@@ -97,6 +101,8 @@ export class ArticleController {
       title: article.title,
       body: article.body,
       favoriteCount: article.favoriteCount,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
     });
   }
 
@@ -122,6 +128,8 @@ export class ArticleController {
       title: article.title,
       body: article.body,
       favoriteCount: article.favoriteCount,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
     });
   }
 
@@ -140,6 +148,8 @@ export class ArticleController {
       title: article.title,
       body: article.body,
       favoriteCount: article.favoriteCount,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
     });
   }
 
@@ -168,6 +178,8 @@ export class ArticleController {
       title: article.title,
       body: article.body,
       favoriteCount: article.favoriteCount,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
     });
   }
 }

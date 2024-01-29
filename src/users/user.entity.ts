@@ -11,10 +11,14 @@ export class UserEntity {
   @ApiProperty({ type: String })
   username: string;
 
-  constructor({ id, email, username }: Record<string, string>) {
+  @ApiProperty({ type: String })
+  fullname: string;
+
+  constructor({ id, email, username, fullname }: Record<string, string>) {
     this.id = id;
     this.email = email;
     this.username = username;
+    this.fullname = fullname;
   }
 }
 
