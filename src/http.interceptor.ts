@@ -24,6 +24,7 @@ export class HttpInterceptor implements NestInterceptor {
         url: request.url,
         params: request.params,
       };
+      console.info(JSON.stringify(requestLog));
       logger.info("Request", requestLog);
     }
     return next.handle();
