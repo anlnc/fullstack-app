@@ -6,13 +6,9 @@ Fullstack App - Backend
 
 API servers for handling Users and Articles
 
-## Installation
-
-Instructions for how to install your project. This might include commands like `npm install`.
-
 ## Deployment
 
-he deployment of this project utilizes the container orchestration solution offered by Google Cloud Run.
+The deployment of this project utilizes the container orchestration solution offered by Google Cloud Run.
 
 ## API Docs
 
